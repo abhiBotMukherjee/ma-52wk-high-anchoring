@@ -1,4 +1,4 @@
-# Does the Target's 52-Week High Anchor the Offer Price in M&A?
+# How does anchoring on a target's 52-week high affect acquirer returns in M&A?
 
 Code and results for a behavioral finance paper on **anchoring in mergers and acquisitions**.
 
