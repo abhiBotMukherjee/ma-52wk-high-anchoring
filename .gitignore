@@ -1,0 +1,17 @@
+# --- Licensed / derived data: never commit (SDC, CRSP, and files derived from them) ---
+data/raw/*
+data/interim/*
+data/processed/*
+data/external/*
+!data/*/.gitkeep
+
+# --- Local-only ---
+_archive/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store
+.env
+*.log

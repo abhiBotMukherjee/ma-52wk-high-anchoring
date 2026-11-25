@@ -1,0 +1,8 @@
+# Pinned to the versions the results were produced with.
+pandas==3.1.1
+numpy==2.5.5
+scipy==1.18.1
+jupyterlab==4.6.6
+ipykernel==7.4.0
+# Only for notebook 01 (WRDS data build); not needed to run the analysis:
+# wrds
