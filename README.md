@@ -20,7 +20,8 @@ Code and results for a behavioral finance paper on **anchoring in mergers and ac
 .
 ├── notebooks/
 │   ├── 01_wrds_data_build.ipynb   # builds the data from WRDS (needs a WRDS account)
-│   └── 02_analysis.ipynb          # deciles, CAR, BHAR, tests, report tables (with outputs)
+│   ├── 02_analysis.ipynb          # deciles, CAR, BHAR, tests, report tables (with outputs)
+│   └── 03_calendar_time_alpha.ipynb  # monthly calendar-time FF5 + momentum alpha by decile
 ├── data/                          # NOT tracked: licensed data goes here (see Data sources)
 ├── results/                       # aggregate output tables (CSV)
 ├── docs/METHODS.md                # definitions, sample rules, decision log, limitations
@@ -36,7 +37,7 @@ pip install -r requirements.txt
 jupyter lab
 ```
 
-Put the data files listed below in `data/`, then run `notebooks/02_analysis.ipynb` from top to bottom. It writes the tables in `results/`. Notebook 01 is a record of how the WRDS data was built; you only need it to rebuild the data from scratch (`pip install wrds`).
+Put the data files listed below in `data/`, then run `notebooks/02_analysis.ipynb` from top to bottom. It writes the tables in `results/`. Notebook 03 then runs the calendar-time six-factor regressions. Notebook 01 is a record of how the WRDS data was built; you only need it to rebuild the data from scratch (`pip install wrds`).
 
 Tested with Python 3.14, pandas 3.1, numpy 2.5, scipy 1.18.
 
@@ -52,7 +53,7 @@ SDC and CRSP are licensed through [WRDS](https://wrds-www.wharton.upenn.edu/), s
 | `acquirer_decile_1.csv` ... `acquirer_decile_10.csv` | `interim/` | CRSP daily stock file (`crsp.dsf_v2`) | Acquirer daily returns over [announcement - 400, announcement + 400] calendar days, built by notebook 01. The decile stored inside these files is ignored; deciles always come from the SDC file. |
 | `F-F_Research_Data_5_Factors_2x3_daily.csv` | `external/` | [Kenneth French Data Library](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) | Download "Fama/French 5 Factors (2x3) [Daily]" (CSV) and unzip. Used for the market return and the trading calendar. |
 
-The monthly 5-factor file and the daily and monthly momentum files are kept in `external/` for the planned calendar-time alpha but are not used yet.
+`F-F_Research_Data_5_Factors_2x3.csv` and `F-F_Momentum_Factor.csv` (monthly, same library) are used by notebook 03. The daily momentum file is not used.
 
 **Columns of the enriched SDC file.** Original SDC columns (never modified): `master_cusip` (target CUSIP), `acusip` (acquirer CUSIP), `dateann`, `dateannorig`, `amv`, `status`, `aup`, `tup`, `anation`, `tnation`, `tpublic`, `apublic`, `tticker`, `deal_value` ($ millions), `pr` (offer price per share), `consid`, `considoff`. Added by notebook 01: 6-character CUSIP keys, `is_dup`, CRSP PERMNOs (`tpermno*`, `apermno*`), `is_matched`, `target_52wk_high`, `pr_filled`, `offer_price`, `anchor_distance`. Added by notebook 02: `pctown`, `include_decile`, `anchor_decile`. A deal is one (`master_cusip`, `acusip`, `dateann`) key; 34 keys appear twice and the first copy is used.
 
@@ -73,6 +74,9 @@ Full definitions, every sample rule, and the dated decision log are in [`docs/ME
 | `results/report_table_by_decile.csv` | Per decile and period: n, mean, median, sd, winsorized mean, t, p |
 | `results/report_table_by_decile_wide.csv` | The same means as `mean% (t)` with significance stars |
 | `results/report_table_spreads.csv` | D1 - D10 and D1-2 minus D9-10 spread tests |
+| `results/calendar_time_six_factor_alpha.csv` | Monthly six-factor alpha and loadings for D1, D10 and D1 - D10 (EW/VW, lags, minimum deal counts, WLS, firm-deduplicated) |
+| `results/calendar_time_six_factor_alpha_d23_vs_d89.csv` | Same regressions for pooled D2-3 (long) vs D8-9 (short) |
+| `results/calendar_time_six_factor_alpha_d10_by_payment.csv` | Same regressions for Decile 10 split by form of payment (cash / stock / mixed), with D1-9 controls |
 
 The analysis is deterministic: permutation and bootstrap draws use a fixed seed (`SEED` in the notebook's settings cell).
 
@@ -83,7 +87,7 @@ The analysis is deterministic: permutation and bootstrap draws use a fixed seed 
 - Where SDC reports no per-share price, the offer price is filled as `deal_value x 1000 / shrout`, which assumes `deal_value` prices 100% of the equity. 40 of the 1,461 decile deals use this fill.
 - No deal-size, overlapping-deal, industry (financials / utilities) or exchange filter is applied.
 - Notebook 01 omits the CRSP `stocknames` load and the PERMNO tie-breaker; the enriched data file already contains their output.
-- A calendar-time Fama-French five-factor plus momentum alpha is planned and not implemented.
+- Calendar-time portfolios hold about 7 deals per decile-month and are thin in some months; the `N >= 10` robustness leaves 65 to 73 months for D10 and too few (not estimated) for the D1 - D10 spread. CRSP v2 daily returns are assumed to include delisting returns (there is no separate `DLRET` in the files).
 
 ## Citation and license
 

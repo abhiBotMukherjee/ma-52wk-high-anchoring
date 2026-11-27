@@ -76,4 +76,4 @@ Deciles are formed with `pandas.qcut` on the deals that pass steps 3 to 6 (equal
 - The sample ends up with 1,461 deals in deciles; of these, 1,441 have a CAR and 1,432 have a full-year BHAR.
 - The 29 deals without a full-year BHAR have at least one missing acquirer return in the 252-day window. The cause (for example a delisting) has not been checked, and no delisting adjustment is made.
 - 34 repeated deal keys exist in the SDC file; the first copy is used.
-- The calendar-time portfolio alpha (Fama-French five factors plus momentum) is planned and not implemented. The factor files are stored in `data/external/` for it.
+- Calendar-time alpha (notebook 03): deals enter their decile portfolio for months tau+1..tau+12; EW and VW (lagged month-end `dlycap`) returns regressed on Mkt-RF, SMB, HML, RMW, CMA, UMD with Newey-West errors. Delisting returns are assumed included in CRSP v2 `dlyret`. Regressions with fewer than 30 months are not estimated.
